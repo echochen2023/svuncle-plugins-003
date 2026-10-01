@@ -4,7 +4,7 @@ description: 把本機的變更部署到 GitHub Pages(build → push 到 gh-page
 
 這個專案的部署方式是用 `gh-pages` npm 套件把 `vite build` 的輸出(`build/` 目錄)推到 `gh-pages` 分支,GitHub Pages 再從那個分支發布靜態網站。這是**第二個**部署目標,跟既有的 `/deploy_vercel`(push 到 `main` 自動觸發 Vercel)並存、互不影響——兩者是獨立的部署管道。
 
-目前已知的正式設定(如果 repo 已經存在,以下就是現況):GitHub repo `echochen2023/claude_code_treasure_game_by_echo`(Public,GitHub Pages 在 Free 方案下無法用於 Private repo),正式網址 `https://echochen2023.github.io/claude_code_treasure_game_by_echo/`。但不要假設這一定已經設定好——如果換了一台新機器、還沒登入過 `gh`,或是這個 repo 因故不存在了,先照下面「Step 0」處理,不要直接跳到日常部署步驟。
+目前已知的正式設定(如果 repo 已經存在,以下就是現況):GitHub repo `echochen2023/svuncle-plugins-003`(Public,GitHub Pages 在 Free 方案下無法用於 Private repo),正式網址 `https://echochen2023.github.io/svuncle-plugins-003/`。但不要假設這一定已經設定好——如果換了一台新機器、還沒登入過 `gh`,或是這個 repo 因故不存在了,先照下面「Step 0」處理,不要直接跳到日常部署步驟。
 
 ## Step 0:確認 GitHub 帳號與 repo 是否就緒
 
@@ -23,7 +23,7 @@ description: 把本機的變更部署到 GitHub Pages(build → push 到 gh-page
 - 如果目前資料夾還不是 git repo(`git status` 報錯):跑 `git init`。
 - 如果有 `origin` remote,先跑 `gh repo view`(或 `git ls-remote origin`)確認這個 remote 指向的 repo **真的存在**、而且**目前登入的帳號存取得到**——不要只看本機 `git remote -v` 有設定值就假設沒問題,repo 有可能已經在 GitHub 上被刪除、改名,或轉移給別的帳號。
 - 如果**沒有 `origin` remote**,或確認後發現 remote 指向的 repo 不存在,代表還沒有對應的 GitHub repo,需要建立一個新的:
-  1. 跟使用者確認三件事:repo 名稱(可以先建議用目前資料夾名稱,或沿用這份文件記錄的既有名稱 `claude_code_treasure_game_by_echo`)、要建在 0-1 確認過的哪個帳號/組織下、Public 還是 Private——並提醒使用者 **GitHub Pages 在 Free 方案下必須是 Public repo** 才能用,如果使用者堅持要 Private,GitHub Pages 這個部署目標就沒辦法用。
+  1. 跟使用者確認三件事:repo 名稱(可以先建議用目前資料夾名稱,或沿用這份文件記錄的既有名稱 `svuncle-plugins-003`)、要建在 0-1 確認過的哪個帳號/組織下、Public 還是 Private——並提醒使用者 **GitHub Pages 在 Free 方案下必須是 Public repo** 才能用,如果使用者堅持要 Private,GitHub Pages 這個部署目標就沒辦法用。
   2. **在真的執行建立 repo 之前,先跟使用者確認一次**(這會建立一個新的、可能公開的遠端資源,是不可逆的公開動作,不要自動跳過確認),列出即將執行的指令、repo 名稱和可見度。
   3. 確認後執行 `gh repo create <repo-name> --public --source=. --remote=origin`。如果本機已經有 commit,可以加 `--push` 一併推上去;如果還沒有任何 commit,建立完 remote 後,讓後面「日常部署」的步驟 2 去處理 commit + push。
   4. 如果這個專案本身也還沒做過 GitHub Pages 的技術設定(`vite.config.ts` 沒有條件式 `base`、`package.json` 沒有 `gh-pages` 依賴和 `predeploy`/`deploy` scripts),用剛剛確認好的 repo 名稱組出 base path(`/<repo-name>/`),照下面「這個專案的 GitHub Pages 特殊設定」那節的模式補上,而不是假設它已經存在——這通常只會發生在把這份指令當範本套用到全新專案的情況,不是這個 repo 目前的狀態。
@@ -31,7 +31,7 @@ description: 把本機的變更部署到 GitHub Pages(build → push 到 gh-page
 
 ## 這個專案的 GitHub Pages 特殊設定(不要動)
 
-- `vite.config.ts` 的 `base` 是條件式的:`process.env.GH_PAGES === 'true' ? '/claude_code_treasure_game_by_echo/' : '/'`。因為 GitHub Pages 是 project page(網址帶 repo 名稱路徑),資產路徑必須加上這個前綴,否則畫面會空白(assets 404)。一般的 `npm run build`(給 Vercel 用)維持 `base: '/'` 不受影響。
+- `vite.config.ts` 的 `base` 是條件式的:`process.env.GH_PAGES === 'true' ? '/svuncle-plugins-003/' : '/'`。因為 GitHub Pages 是 project page(網址帶 repo 名稱路徑),資產路徑必須加上這個前綴,否則畫面會空白(assets 404)。一般的 `npm run build`(給 Vercel 用)維持 `base: '/'` 不受影響。
 - `package.json` 的 `predeploy` 腳本是 `GH_PAGES=true vite build`,`deploy` 腳本是 `gh-pages -d build`。`npm run deploy` 會自動先跑 `predeploy` 再推分支。
 
 ## 日常部署
@@ -46,18 +46,18 @@ description: 把本機的變更部署到 GitHub Pages(build → push 到 gh-page
 
 4. **push 到 `origin main`**(如果有新 commit 的話),接著跑 `npm run deploy`。這會用 `GH_PAGES=true` 重新 build 一次(確保 base path 正確),再用 `gh-pages` 套件把 `build/` 推到 `origin` 的 `gh-pages` 分支。
 
-5. **等待並驗證部署**:GitHub Pages 通常在 1~2 分鐘內生效。如果有瀏覽器工具可用,等待約 60~90 秒後打開正式網址 `https://echochen2023.github.io/claude_code_treasure_game_by_echo/`,截圖確認:
+5. **等待並驗證部署**:GitHub Pages 通常在 1~2 分鐘內生效。如果有瀏覽器工具可用,等待約 60~90 秒後打開正式網址 `https://echochen2023.github.io/svuncle-plugins-003/`,截圖確認:
    - 畫面正常顯示登入方式選擇畫面,不是空白頁或 assets 404(代表 base path 設定跑掉)
    - 不是 GitHub 的 404 頁面(代表 Pages 還沒生效或 Source 設定不對)
 
 6. **回報結果**給使用者:部署狀態、正式網址,以及這次改動摘要。如果畫面異常,依照下面的排查清單處理而不是直接結案。
 
-7. **最後一定要單獨把正式網址列出來**,方便使用者自己點開來看:`https://echochen2023.github.io/claude_code_treasure_game_by_echo/`。這一步不管第 5 步驗證結果是否正常都要做。
+7. **最後一定要單獨把正式網址列出來**,方便使用者自己點開來看:`https://echochen2023.github.io/svuncle-plugins-003/`。這一步不管第 5 步驗證結果是否正常都要做。
 
 ## 排查清單(部署後畫面不對時)
 
 - GitHub 的 404 頁面(不是這個 app 的畫面):到 repo 的 **Settings → Pages** 確認 Source 是設成「Deploy from a branch」、分支選 `gh-pages`、資料夾選 `/ (root)`。實測第一次跑 `npm run deploy` 建立 `gh-pages` 分支後,GitHub 有自動偵測並啟用這個設定,但如果第一次部署後還是 404,還是去這裡確認一次。剛啟用時網站生效也可能要等 1~2 分鐘。
-- 空白頁,主控台看到 assets 404(路徑對不到 `/claude_code_treasure_game_by_echo/...`):代表這次是用一般 `npm run build`(base `/`)build 出來的,不是用 `npm run deploy`/`predeploy` 的 `GH_PAGES=true` 版本。重新跑 `npm run deploy` 而不是手動 `gh-pages -d build` 配上舊的 `build/`。
+- 空白頁,主控台看到 assets 404(路徑對不到 `/svuncle-plugins-003/...`):代表這次是用一般 `npm run build`(base `/`)build 出來的,不是用 `npm run deploy`/`predeploy` 的 `GH_PAGES=true` 版本。重新跑 `npm run deploy` 而不是手動 `gh-pages -d build` 配上舊的 `build/`。
 - 登入後沒反應,或收不到驗證碼信:現在的登入是輸入驗證碼,不是點信裡的連結,跟這個部署管道的 base path/redirect 設定無關——Supabase 的 Redirect URLs 允許清單已經不是這條登入流程需要的東西了(舊的 magic-link 設定就算還留著也不影響)。這類問題是 Supabase Email Template 或寄信本身的問題,不是 GitHub Pages 部署失敗,不用往 base path 那個方向排查。
 - repo 被改回 Private:GitHub Pages 在 Free 方案的 Private repo 上會直接失效,網站會 404;這種情況照 Step 0-2 的邏輯會被 `gh repo view` 抓到(repo 存在但可能行為異常),但保險起見還是直接去 repo 的 **Settings → General → Danger Zone** 確認可見度。
 

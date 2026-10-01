@@ -49,7 +49,7 @@
         '@': path.resolve(__dirname, './src'),
       },
     },
-    base: process.env.GH_PAGES === 'true' ? '/claude_code_treasure_game_by_echo/' : '/',
+    base: process.env.GH_PAGES === 'true' ? '/svuncle-plugins-003/' : '/',
     build: {
       target: 'esnext',
       outDir: 'build',
